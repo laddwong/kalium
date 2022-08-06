@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../shared/src/index.ts", "../src/index.ts"],
+  "sourcesContent": ["export const isArray = (value:any):boolean => {\r\n  return Array.isArray(value)\r\n}", "import { isArray } from \"@vue/shared\";\r\n\r\nisArray([])\r\nisArray({})"],
+  "mappings": ";;AAAO,MAAM,UAAU,CAAC,UAAsB;AAC5C,WAAO,MAAM,QAAQ,KAAK;AAAA,EAC5B;;;ACAA,UAAQ,CAAC,CAAC;AACV,UAAQ,CAAC,CAAC;",
+  "names": []
+}
