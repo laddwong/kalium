@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>reactivity</title>
+</head>
+<body>
+  <div id="app"></div>
+  
+  <script src="../../packages/reactivity/dist/reactivity.global.js"></script>
+  <script>
+    const reactive = VueReactivity.reactive;
+    // 基本的proxy功能
+    let user1 = {
+      name: 'user1',
+      age: 18
+    }
+    let user1InProxy = reactive(user1)
+    // 同一对象重复reactive
+    let user1InProxyAgain = reactive(user1)
+    console.log('同一对象重复reactive，结果是否相等', user1InProxy === user1InProxyAgain);
+    // 将reactive出来的proxy实例再次进行reactive
+    let user1InProxyProxy = reactive(user1InProxy)
+    console.log('将reactive出来的proxy实例再次进行reactive，结果是否相等', user1InProxy === user1InProxyProxy);
+  </script>
+</body>
+</html>

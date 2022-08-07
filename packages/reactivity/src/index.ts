@@ -1,4 +1,1 @@
-import { isArray } from "@vue/shared";
-
-isArray([])
-isArray({})
+export { reactive } from './reactive';
