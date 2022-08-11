@@ -1,16 +1,18 @@
-class ReactiveEffect {
+export class ReactiveEffect<T = any> {
   parentEffect: ReactiveEffect
   constructor(public fn: Function) {
     this.parentEffect = null
   }
   run() {
+    if(activeEffect === this) return
+    this.parentEffect = activeEffect || null
     activeEffect = this
     this.fn()
-    activeEffect = false
+    activeEffect = this.parentEffect
   }
 }
 
-let activeEffect = null
+export let activeEffect = null;
 
 export function effect(fn: Function): void {
   const effect = new ReactiveEffect(fn)

@@ -7,21 +7,42 @@
   <title>Effect Test</title>
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <p id="name"></p>
+    <p id="age"></p>
+    <p id="role"></p>
+  </div>
   <script src="../../packages/reactivity/dist/reactivity.global.js"></script>
   <script>
     const reactive = VueReactivity.reactive;
     const effect = VueReactivity.effect;
     const user = {
-      name: 'name'
+      name: 'name',
+      age: 1,
+      role: 'admin'
     }
     const userProxy = reactive(user)
+    // effect(() => {
+    //   name.textContent = userProxy.name
+
+    //   // 重复获取
+    //   console.log(userProxy.name)
+    //   console.log(userProxy.name)
+    //   console.log(userProxy.name)
+    // })
+    // setTimeout(() => {
+    //   // userProxy.name = 'newName'
+    //   userProxy.age++
+    //   userProxy.role = 'adminPro'
+    // }, 2000);
+
+    // 嵌套effect
     effect(() => {
-      document.querySelector('#app').textContent = userProxy.name
+      age.textContent = userProxy.age
+      effect(() => {
+        role.textContent = userProxy.role
+      })
     })
-    setTimeout(() => {
-      userProxy.name = 'newName'
-    }, 3000);
   </script>
 </body>
 </html>
