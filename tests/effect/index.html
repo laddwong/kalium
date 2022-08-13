@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Effect Test</title>
 </head>
+
 <body>
   <div id="app">
     <p id="name"></p>
@@ -37,12 +39,28 @@
     // }, 2000);
 
     // 嵌套effect
+    // effect(() => {
+    //   age.textContent = userProxy.age
+    //   effect(() => {
+    //     role.textContent = userProxy.role
+    //   })
+    // })
+
+    // effect外取值不加入依赖
+    let age = userProxy.age
+    userProxy.age++
+
+    // 分支问题
+    let flag = false
     effect(() => {
-      age.textContent = userProxy.age
-      effect(() => {
-        role.textContent = userProxy.role
-      })
+      if (flag) {
+        document.querySelector('#age').innerText = userProxy.age
+      } else {
+        document.querySelector('#name').innerText = userProxy.name
+      }
+      flag = true
     })
   </script>
 </body>
+
 </html>

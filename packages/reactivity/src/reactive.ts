@@ -4,8 +4,8 @@ import { activeEffect, ReactiveEffect } from "./effect";
 const proxyCache = new WeakMap()
 
 // 数据对象->字段名->ReactiveEffect实例
-type EffectSet = Set<ReactiveEffect>
-type KeyToEffects = Map<any, EffectSet>;
+export type EffectSet = Set<ReactiveEffect>
+export type KeyToEffects = Map<any, EffectSet>;
 const dataToEffectMap = new WeakMap<any, KeyToEffects>()
 
 const linkDataToEffect = (target: object, key: any, effect: ReactiveEffect): void => {
@@ -20,7 +20,35 @@ const linkDataToEffect = (target: object, key: any, effect: ReactiveEffect): voi
     keyMapForTarget.set(key, effectSetForKey)
   }
   if(!effectSetForKey.has(effect)) { // 数据对象的key的effect列表内是否有某个effect
+    console.log('收集到effect：', effect);
     effectSetForKey.add(effect)
+    // effect反向记录关联的数据
+    effect.deps.push(effectSetForKey)
+  }
+}
+
+/** 设置数据时，找到对应的effect触发响应 */
+const activeForDataSet = (target: object, key: any) => {
+  const targetToMap = dataToEffectMap.get(target)
+  if(targetToMap) {
+    const keyToEffects = targetToMap.get(key)
+    // 这样写会死循环
+    /* 循环路径：数据的set -> 遍历收集到的effect列表 -> 调用effect的run -> run中调用fn前清空 -> 调用fn触发get收集effect ↓
+                                ↑------------------------------添加effect到列表-------------------------------------
+    */
+    // if(keyToEffects) {
+    //   keyToEffects.forEach(item => {
+    //     item.run()
+    //   })
+    // }
+
+    // 拷贝一份调用run进行更新，原来那份会被清空然后重新收集依赖
+    const keyToEffectsCopy = new Set(keyToEffects)
+    if(keyToEffectsCopy) {
+      keyToEffectsCopy.forEach(item => {
+        item.run()
+      })
+    }
   }
 }
 
@@ -40,6 +68,7 @@ export function reactive(target: object) {
 
       // 将数据对象->key->effect关联起来，如果是非effect内调用的就没有activeEffect，就不用关联
       if(activeEffect) {
+        console.log('收集了依赖', target, key, activeEffect);
         linkDataToEffect(target, key, activeEffect)
       }
 
@@ -51,15 +80,7 @@ export function reactive(target: object) {
       const newVal = value
       let result = Reflect.set(target, key, value, receive)
       if(oldVal !== newVal) {
-        const targetToMap = dataToEffectMap.get(target)
-        if(targetToMap) {
-          const KeyToEffects = targetToMap.get(key)
-          if(KeyToEffects) {
-            KeyToEffects.forEach(item => {
-              item.run()
-            })
-          }
-        }
+        activeForDataSet(target, key)
       }
       return result
     }
