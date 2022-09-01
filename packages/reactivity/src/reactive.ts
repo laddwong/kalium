@@ -71,9 +71,16 @@ export function reactive(target: object) {
         console.log('收集了依赖', target, key, activeEffect);
         linkDataToEffect(target, key, activeEffect)
       }
-
+      
       // 使用Reflect保证取值时的this指向到target的proxy实例，而非target本身
-      return Reflect.get(target, key, receive)
+      let res = Reflect.get(target, key, receive)
+
+      // 如果读取的是一个对象，进行嵌套代理
+      if(typeof res === 'object' && res !== null) {
+        return reactive(res)
+      }
+
+      return res
     },
     set(target, key, value, receive) {
       const oldVal = target[key]
